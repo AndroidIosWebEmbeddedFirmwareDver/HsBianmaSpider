@@ -266,7 +266,7 @@ def getNaviHtmlNode(soup):
 def getNaviHtmlNodeContent(soup):
     tag = getNaviHtmlNode(soup)
     print(tag)
-    print('\nCIQ代码：-------------\n')
+    print('\n导航信息：-------------\n')
     point = 0
     naviHtmls: [HsMsgNaviHtmlPojo] = []
     for index in tag.find_all('span'):
@@ -276,7 +276,7 @@ def getNaviHtmlNodeContent(soup):
         mCache.link = 'https://www.hsbianma.com'+mCache.link
         point = point + 1
         naviHtmls.append(mCache)
-    print(objectToJsonStr(naviHtmls))
+    # print(objectToJsonStr(naviHtmls))
     return naviHtmls
 
 
