@@ -20,6 +20,16 @@ def objectToJsonStr(mObject: object):
     return json.dumps(mObject.__dict__, ensure_ascii=False)
 
 
+# 序列化嵌套对象为字符串
+def nestedObjectToJsonStr(mObject: object):
+    return json.dumps(mObject.__dict__, default=lambda o: o.__dict__, ensure_ascii=False)
+
+
+# 反序列化嵌套字符串为对象
+def JsonStrToHsMsgPojo(mStr):
+    return HsMsgPojo(** json.loads(mStr))
+
+
 # 获取网页
 def requestTest():
     response = requests.get("https://www.hsbianma.com/Code/0106329000.html")
@@ -63,7 +73,7 @@ def getBaseInfoNode(soup):
 def getBaseInfoNodeContent(soup):
     tag = getBaseInfoNode(soup).find_next_sibling()
     # print(tag)
-    print('\n基本信息：-------------\n')
+    # print('\n基本信息：-------------\n')
     point = 0
     mCache = HsMsgBaseInfoPojo()
     for index in tag.find_all('td'):
@@ -94,7 +104,7 @@ def getTaxRateInformationNode(soup):
 def getTaxRateInformationContent(soup):
     tag = getTaxRateInformationNode(soup).find_next_sibling()
     # print(tag)
-    print('\n税率信息：-------------\n')
+    # print('\n税率信息：-------------\n')
     point = 0
     mCache = HsMsgTaxRateInformationPojo()
     for index in tag.find_all('td'):
@@ -136,7 +146,7 @@ def getElementsOfDeclarationNode(soup):
 def getElementsOfDeclarationNodeContent(soup):
     tag = getElementsOfDeclarationNode(soup).find_next_sibling()
     # print(tag)
-    print('\n申报要素：-------------\n')
+    # print('\n申报要素：-------------\n')
     point = 0
     mCache = HsMsgElementsOfDeclarationPojo()
     for index in tag.find_all('td'):
@@ -161,7 +171,7 @@ def getRegulationConditionsNode(soup):
 def getRegulationConditionsNodeContent(soup):
     tag = getRegulationConditionsNode(soup).find_next_sibling()
     # print(tag)
-    print('\n监管条件：-------------\n')
+    # print('\n监管条件：-------------\n')
     point = 0
     mCache = HsMsgRegulationConditionsPojo()
     for index in tag.find_all('td'):
@@ -186,7 +196,7 @@ def getInspectionAndQuarantineCategoriesNode(soup):
 def getInspectionAndQuarantineCategoriesNodeContent(soup):
     tag = getInspectionAndQuarantineCategoriesNode(soup).find_next_sibling()
     # print(tag)
-    print('\n检验检疫类别：-------------\n')
+    # print('\n检验检疫类别：-------------\n')
     point = 0
     mCache = HsMsgInspectionAndQuarantineCategoriesPojo()
     for index in tag.find_all('td'):
@@ -211,7 +221,7 @@ def getSubordinateChaptersNode(soup):
 def getSubordinateChaptersNodeContent(soup):
     tag = getSubordinateChaptersNode(soup).find_next_sibling()
     # print(tag)
-    print('\n所属章节：-------------\n')
+    # print('\n所属章节：-------------\n')
     point = 0
     mCache = HsMsgSubordinateChaptersPojo()
     chapter = None
@@ -241,7 +251,7 @@ def getCIQCodeNode(soup):
 def getCIQCodeNodeContent(soup):
     tag = getCIQCodeNode(soup).find_next_sibling()
     # print(tag)
-    print('\nCIQ代码：-------------\n')
+    # print('\nCIQ代码：-------------\n')
     point = 0
     mCache = HsMsgCIQCodePojo()
     for index in tag.find_all('td'):
@@ -258,22 +268,22 @@ def getCIQCodeNodeContent(soup):
 # 获取导航信息
 def getNaviHtmlNode(soup):
     tag = getCIQCodeNode(soup).find_next_sibling().find_next_sibling()
-    print(tag)
+    # print(tag)
     return tag
 
 
 # 获取导航信息内容
 def getNaviHtmlNodeContent(soup):
     tag = getNaviHtmlNode(soup)
-    print(tag)
-    print('\n导航信息：-------------\n')
+    # print(tag)
+    # print('\n导航信息：-------------\n')
     point = 0
     naviHtmls: [HsMsgNaviHtmlPojo] = []
     for index in tag.find_all('span'):
         mCache = HsMsgNaviHtmlPojo()
         mCache.name = index.text
         mCache.link = index.a['href']
-        mCache.link = 'https://www.hsbianma.com'+mCache.link
+        mCache.link = 'https://www.hsbianma.com' + mCache.link
         point = point + 1
         naviHtmls.append(mCache)
     # print(objectToJsonStr(naviHtmls))
@@ -300,5 +310,5 @@ if __name__ == '__main__':
     # 7.获取CIQ代码
     hsMagPojo.ciq = getCIQCodeNodeContent(soupHtml)
     # 8.打印全部内容
-    # print(objectToJsonStr(hsMagPojo))
-    getNaviHtmlNodeContent(soupHtml)
+    print(nestedObjectToJsonStr(hsMagPojo))
+    # getNaviHtmlNodeContent(soupHtml)
