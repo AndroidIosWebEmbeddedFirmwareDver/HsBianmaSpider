@@ -344,7 +344,7 @@ if __name__ == '__main__':
         # 0.内容写入文件
         writeJsonToFile(
             '[' + hsMagPojo.baseInfo.productCodeStatus + ']' + hsMagPojo.baseInfo.productName + hsMagPojo.baseInfo.productCode + '.json',
-            hsMagPojoJson.encode('utf-8'))
+            hsMagPojoJson.replace('/','+').encode('utf-8'))
         # 1.打印全部内容
         print(hsMagPojoJson)
         # 2.休眠300毫秒，防止被屏蔽
