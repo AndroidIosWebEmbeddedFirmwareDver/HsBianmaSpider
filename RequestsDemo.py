@@ -15,7 +15,7 @@ from pojo.HsMsgCIQCodePojo import HsMsgCIQCodePojo
 from pojo.HsMsgNaviHtmlPojo import HsMsgNaviHtmlPojo
 
 
-# 序列号对象为字符串
+# 序列化对象为字符串
 def objectToJsonStr(mObject: object):
     return json.dumps(mObject.__dict__, ensure_ascii=False)
 
