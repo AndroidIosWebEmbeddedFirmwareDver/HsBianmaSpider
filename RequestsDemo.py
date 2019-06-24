@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 
+import os
 import json
+import time
 
 from pojo.HsMsgPojo import HsMsgPojo
 from pojo.HsMsgBaseInfoPojo import HsMsgBaseInfoPojo
@@ -27,12 +29,12 @@ def nestedObjectToJsonStr(mObject: object):
 
 # 反序列化嵌套字符串为对象
 def JsonStrToHsMsgPojo(mStr):
-    return HsMsgPojo(** json.loads(mStr))
+    return HsMsgPojo(**json.loads(mStr))
 
 
 # 获取网页
-def requestTest():
-    response = requests.get("https://www.hsbianma.com/Code/0106329000.html")
+def requestTest(html):
+    response = requests.get(html)
     response.encoding = 'utf-8'
     # print(response.text)
     return response.text
@@ -88,7 +90,7 @@ def getBaseInfoNodeContent(soup):
         # else:
         # print(index.text)
         point = point + 1
-    print(objectToJsonStr(mCache))
+    # print(objectToJsonStr(mCache))
 
     return mCache
 
@@ -129,7 +131,7 @@ def getTaxRateInformationContent(soup):
         # else:
         #     print(index.text)
         point = point + 1
-    print(objectToJsonStr(mCache))
+    # print(objectToJsonStr(mCache))
     return mCache
 
 
@@ -155,7 +157,7 @@ def getElementsOfDeclarationNodeContent(soup):
         # else:
         #     print(index)
         point = point + 1
-    print(objectToJsonStr(mCache))
+    # print(objectToJsonStr(mCache))
     return mCache
 
 
@@ -180,7 +182,7 @@ def getRegulationConditionsNodeContent(soup):
         # else:
         #     print(index)
         point = point + 1
-    print(objectToJsonStr(mCache))
+    # print(objectToJsonStr(mCache))
     return mCache
 
 
@@ -205,7 +207,7 @@ def getInspectionAndQuarantineCategoriesNodeContent(soup):
         # else:
         #     print(index)
         point = point + 1
-    print(objectToJsonStr(mCache))
+    # print(objectToJsonStr(mCache))
     return mCache
 
 
@@ -260,7 +262,7 @@ def getCIQCodeNodeContent(soup):
         else:
             mCache.code = index.text
         point = point + 1
-    print(objectToJsonStr(mCache))
+    # print(objectToJsonStr(mCache))
     return mCache
 
 
@@ -290,11 +292,11 @@ def getNaviHtmlNodeContent(soup):
     return naviHtmls
 
 
-# 主方法入口
-if __name__ == '__main__':
+# 获取一次"0106329000"的内容
+def getMainHtmlContent(html):
     hsMagPojo = HsMsgPojo()
     # 获取全局文档
-    soupHtml = soupTest(requestTest())
+    soupHtml = soupTest(requestTest(html))
     # 1.获取基本信息下的内容
     hsMagPojo.baseInfo = getBaseInfoNodeContent(soupHtml)
     # 2.获取税率信息下的内容
@@ -309,6 +311,50 @@ if __name__ == '__main__':
     hsMagPojo.chapters = getSubordinateChaptersNodeContent(soupHtml)
     # 7.获取CIQ代码
     hsMagPojo.ciq = getCIQCodeNodeContent(soupHtml)
-    # 8.打印全部内容
-    print(nestedObjectToJsonStr(hsMagPojo))
-    # getNaviHtmlNodeContent(soupHtml)
+    # 8.获取导航内容
+    hsMagPojo.naviHtmls = getNaviHtmlNodeContent(soupHtml)
+    return hsMagPojo
+
+
+# JSON写入文件
+def writeJsonToFile(fileName, jsonData):
+    if fileName is None:
+        return
+    if jsonData is None:
+        return
+    s = os.getcwd()
+    outputPath = s + '/output'
+    print(s)
+    if not os.path.isdir(outputPath):
+        os.mkdir(outputPath)
+    filePathName = outputPath + '/' + fileName
+    # if os.path.isfile(outputPath+'/'+fileName):
+    file = open(filePathName, 'wb')
+    file.write(jsonData)
+    file.close()
+
+
+# 主方法入口
+if __name__ == '__main__':
+    index = 0
+    html = 'https://www.hsbianma.com/Code/0101101010.html'
+    while index == 0:
+        hsMagPojo = getMainHtmlContent(html)
+        hsMagPojoJson = nestedObjectToJsonStr(hsMagPojo)
+        # 0.内容写入文件
+        writeJsonToFile(
+            '[' + hsMagPojo.baseInfo.productCodeStatus + ']' + hsMagPojo.baseInfo.productName + hsMagPojo.baseInfo.productCode + '.json',
+            hsMagPojoJson.encode('utf-8'))
+        # 1.打印全部内容
+        print(hsMagPojoJson)
+        # 2.休眠300毫秒，防止被屏蔽
+        time.sleep(0.3)
+        if hsMagPojo.naviHtmls is not None:
+            for naviHtml in hsMagPojo.naviHtmls:
+                if naviHtml is not None:
+                    if naviHtml.name is not None:
+                        if naviHtml.name.find('下一条') >= 0:
+                            # print('\n' + naviHtml.name + '\n')
+                            html = naviHtml.link
+                else:
+                    index = 1

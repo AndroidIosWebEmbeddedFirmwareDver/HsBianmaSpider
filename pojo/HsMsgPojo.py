@@ -5,6 +5,7 @@ from pojo.HsMsgRegulationConditionsPojo import HsMsgRegulationConditionsPojo
 from pojo.HsMsgInspectionAndQuarantineCategoriesPojo import HsMsgInspectionAndQuarantineCategoriesPojo
 from pojo.HsMsgSubordinateChaptersPojo import HsMsgSubordinateChaptersPojo
 from pojo.HsMsgCIQCodePojo import HsMsgCIQCodePojo
+from pojo.HsMsgNaviHtmlPojo import HsMsgNaviHtmlPojo
 
 
 # 编码信息实体类
@@ -25,6 +26,8 @@ class HsMsgPojo:
         self.chapters: HsMsgSubordinateChaptersPojo = None
         # CIQ编码
         self.ciq: HsMsgCIQCodePojo = None
+        # 导航信息
+        self.naviHtmls: [HsMsgNaviHtmlPojo] = None
 
     def __del__(self):
         # 基本信息
@@ -41,3 +44,5 @@ class HsMsgPojo:
         self.chapters: HsMsgSubordinateChaptersPojo = None
         # CIQ编码
         self.ciq: HsMsgCIQCodePojo = None
+        # 导航信息
+        self.naviHtmls: [HsMsgNaviHtmlPojo] = None
